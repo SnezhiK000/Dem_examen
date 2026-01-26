@@ -5,58 +5,66 @@ from django.contrib.auth.models import User
 
 # Артикул
 class Artickles(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=250)
 
 # Наименования товаров
 class ProductsNames(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=250)
 
 # Единицы измерения
 class UnitMes(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=250)
 
 # Поставщик
 class Provider(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=250)
 
 # Производитель
 class Producer(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=250)
 
 # Категория продукта
 class CategoryProduct(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=250)
 #-------------------------------------------------------
 # Категория продукта
 class Photos(models.Model):
-    name = models.CharField()
+    name = models.ImageField()
 #-------------------------------------------------------
 
 # Пункт выдачи
 class PointPlace(models.Model):
-    adress = models.TextField()
+    adress = models.CharField(max_length=250)
 
 # Статусы заказа
 class StatusOrder(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=250)
 
-# Статусы заказа
-class RolesUser(models.Model):
-    name = models.CharField()
+# Роли пользователей
+class Role(models.Model): #РОЛЬ_СВЯЗАНА_С_ГОСТЯМИ
+    ROLE_CHOICES = [
+        ('admin', 'Администратор'),
+        ('manager', 'Менеджер'),
+        ('client', 'Клиент'),
+    ]
+    role_name = models.CharField(max_length=250, choices=ROLE_CHOICES, unique=True)
+
+    def __str__(self):
+        return self.get_role_name_display()
 
 # Пользователь
-class User(models.Model):
-    password = models.CharField()
-    email = models.CharField()
-    FIO = models.CharField()
-    role = models.ForeignKey(RolesUser, on_delete = models.CASCADE)
+class UserHere(models.Model):
+    password = models.CharField(max_length=250)
+    email = models.CharField(max_length=250)
+    FIO = models.CharField(max_length=250)
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
 
 # Заказ
 class Order(models.Model):
     date_order = models.DateField()
     date_delivery = models.DateField()
     point_place = models.ForeignKey(PointPlace, on_delete=models.CASCADE)
-    client_order = models.ForeignKey(User, on_delete=models.CASCADE)
+    client_order = models.ForeignKey(UserHere, on_delete=models.CASCADE)
     code_order = models.IntegerField()
     status_order = models.ForeignKey(StatusOrder, on_delete=models.CASCADE)
 
@@ -70,9 +78,9 @@ class Product(models.Model):
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE)
     producer = models.ForeignKey(Producer, on_delete=models.CASCADE)
     category = models.ForeignKey(CategoryProduct, on_delete=models.CASCADE)
-    discount = models.IntegerField()
+    discount = models.DecimalField(max_digits=10, decimal_places=2)
     count_store = models.IntegerField()
-    description = models.TextField()
+    description = models.TextField(max_length = 250)
     photo_name = models.ForeignKey(Photos, on_delete=models.CASCADE)
 
 # Товар в заказе
